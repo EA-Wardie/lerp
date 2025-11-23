@@ -2,3 +2,11 @@
 @plugin 'daisyui' {
 	themes: black --default;
 }
+
+:root {
+	--color-primary: white;
+	--color-primary-content: black;
+	--color-success: oklch(50.8% 0.118 165.612);
+	--color-error: oklch(51.4% 0.222 16.935);
+	--color-error-content: white;
+}
