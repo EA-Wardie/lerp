@@ -7,6 +7,7 @@
 		type CollectionField,
 	} from '$lib';
 	import { createCollection, createFields } from '$lib/forms';
+	import { ChevronUp, ChevronDown, Trash2 } from '@lucide/svelte';
 
 	const collectionId = crypto.randomUUID();
 	let fields: CollectionField[] = $state([]);
@@ -23,6 +24,10 @@
 			createdAt: Date.now(),
 			deletedAt: null,
 		});
+	};
+
+	const removeField = (index: number) => {
+		fields.splice(index, 1);
 	};
 
 	const submit = (event: SubmitEvent) => {
@@ -58,82 +63,100 @@
 <div class="drawer drawer-end">
 	<input id="collection-create" type="checkbox" class="drawer-toggle" />
 	<div class="drawer-content">
-		<label for="collection-create" class="drawer-button btn w-full btn-primary">
+		<label for="collection-create" class="drawer-button btn w-full btn-sm btn-primary">
 			New Collection
 		</label>
 	</div>
 	<div class="drawer-side">
 		<label for="collection-create" aria-label="close sidebar" class="drawer-overlay"></label>
-		<section class="flex min-h-full w-1/2 flex-col border-l border-base-200 bg-base-100">
-			<div class="shrink border-b border-base-200 py-2 text-center">
+		<section class="flex min-h-full w-100 flex-col border-l border-base-200 bg-base-100">
+			<header
+				class="sticky top-0 z-10 shrink border-b border-base-200 bg-base-100 py-2 text-center"
+			>
 				<h1 class="text-xl">New Collection</h1>
-			</div>
-			<form class="grid grid-cols-2 items-end gap-4 overflow-y-auto p-4" onsubmit={submit}>
-				<label class="input col-span-2 w-full">
-					<span class="label">Name</span>
-					<input required name="name" type="text" placeholder="Enter a name" />
-				</label>
-				<label class="select w-full">
-					<span class="label">Type</span>
-					<select required name="type">
-						{#each Object.keys(CollectionType) as type}
-							<option value={type}>{type}</option>
-						{/each}
-					</select>
-				</label>
-				<label class="select w-full">
-					<span class="label">Status</span>
-					<select required name="status" placeholder="Select a status">
-						{#each Object.keys(CollectionStatus) as status}
-							<option value={status}>{status}</option>
-						{/each}
-					</select>
-				</label>
-				<fieldset
-					class="col-span-full fieldset grid grid-cols-3 gap-4 rounded-box border border-base-200 p-4"
-				>
+			</header>
+			<form class="flex grow flex-col" onsubmit={submit}>
+				<div class="flex grow flex-col gap-4 overflow-y-auto p-4">
+					<label class="input input-sm w-full">
+						<span class="label">Name</span>
+						<input required name="name" type="text" placeholder="Enter a name" />
+					</label>
+					<div class="grid grid-cols-2 gap-4">
+						<label class="select w-full select-sm">
+							<span class="label">Type</span>
+							<select required name="type">
+								{#each Object.keys(CollectionType) as type}
+									<option value={type}>{type}</option>
+								{/each}
+							</select>
+						</label>
+						<label class="select w-full select-sm">
+							<span class="label">Status</span>
+							<select required name="status" placeholder="Select a status">
+								{#each Object.keys(CollectionStatus) as status}
+									<option value={status}>{status}</option>
+								{/each}
+							</select>
+						</label>
+					</div>
 					{#if fields.length}
-						{#each fields as field}
-							<label class="input w-full">
-								<span class="label">Name</span>
-								<input
-									required
-									name="name"
-									type="text"
-									placeholder="Enter a name"
-									bind:value={field.name}
-								/>
-							</label>
-							<label class="select w-full">
-								<span class="label">Type</span>
-								<select required name="type" bind:value={field.type}>
-									{#each Object.keys(FieldType) as type}
-										<option value={type}>{type}</option>
-									{/each}
-								</select>
-							</label>
-							<label class="select w-full">
-								<span class="label">Required</span>
-								<select required name="required" bind:value={field.required}>
-									<option value={true}>Yes</option>
-									<option value={false}>No</option>
-								</select>
-							</label>
+						{#each fields as field, index}
+							<fieldset class="fieldset grid gap-4 border border-base-200 p-4">
+								<label class="input input-sm w-full">
+									<span class="label">Name</span>
+									<input
+										required
+										name="name"
+										type="text"
+										placeholder="Enter a name"
+										bind:value={field.name}
+									/>
+								</label>
+								<div class="grid grid-cols-2 gap-4">
+									<label class="select w-full select-sm">
+										<span class="label">Type</span>
+										<select required name="type" bind:value={field.type}>
+											{#each Object.keys(FieldType) as type}
+												<option value={type}>{type}</option>
+											{/each}
+										</select>
+									</label>
+									<label class="select w-full select-sm">
+										<span class="label">Required</span>
+										<select required name="required" bind:value={field.required}>
+											<option value={true}>Yes</option>
+											<option value={false}>No</option>
+										</select>
+									</label>
+								</div>
+								<div class="grid grid-cols-3 gap-4">
+									<button class="btn btn-xs" type="button">
+										<ChevronUp class="size-4" />
+									</button>
+									<button class="btn btn-xs" type="button">
+										<ChevronDown class="size-4" />
+									</button>
+									<button
+										class="btn btn-xs btn-error"
+										type="button"
+										onclick={() => removeField(index)}
+									>
+										<Trash2 class="size-4" />
+									</button>
+								</div>
+							</fieldset>
 						{/each}
-					{:else}
-						<div class="text-base-400 col-span-full text-center">
-							<p>No fields yet.</p>
-							<p>Start by adding a field below.</p>
-						</div>
 					{/if}
 					<button class="btn col-span-full btn-sm" type="button" onclick={() => addField()}>
 						Add Field
 					</button>
-				</fieldset>
-				<div class="col-start-2 grid w-full grid-cols-2 gap-4">
-					<button class="btn btn-error" type="button">Cancel</button>
-					<button class="btn btn-primary">Create</button>
 				</div>
+				<footer
+					class="sticky bottom-0 grid shrink grid-cols-2 gap-4 border-t border-base-200 bg-base-100 p-4"
+				>
+					<label for="collection-create" class="drawer-button btn btn-sm btn-error"> Cancel </label>
+					<button class="btn btn-sm btn-primary">Create</button>
+				</footer>
 			</form>
 		</section>
 	</div>

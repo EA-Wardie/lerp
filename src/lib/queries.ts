@@ -1,5 +1,5 @@
 import { DB } from './db';
-import type { Collection, CollectionField } from './models';
+import type { Collection, CollectionField, CollectionRecord } from './models';
 
 export const getCollections = (callback: (results: Collection[]) => void) => {
 	DB.collections
@@ -39,5 +39,17 @@ export const getFieldsByCollectionId = (
 		.equals(id || '')
 		.toArray()
 		.then((fields) => callback(fields))
+		.catch(() => callback([]));
+};
+
+export const getRecordsByCollectionId = (
+	id: string | null,
+	callback: (results: CollectionRecord[]) => void,
+) => {
+	DB.records
+		.where('collectionId')
+		.equals(id || '')
+		.toArray()
+		.then((records) => callback(records))
 		.catch(() => callback([]));
 };
